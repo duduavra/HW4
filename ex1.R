@@ -5,8 +5,9 @@ dir.create(td)
 results <- data.frame(queryId = numeric(), sim = numeric())
 
 library(tm)
+library(lsa)
 
-for (i in 1:1749)
+for (i in 5:10)
 {
   
   #preproccesing to query
@@ -57,6 +58,10 @@ for (i in 1:1749)
   
   #preproccesing to description
   desciption<-paste(train$product_description[i], collapse=" ")
+  d=TRUE
+  if(desciption!=""){
+    d=FALSE
+  }
   
   queries_source <- VectorSource(desciption)
   
@@ -73,19 +78,20 @@ for (i in 1:1749)
   desciption<-dtm$dimnames$Terms
   
   write( desciption, file=paste(td, "D2", sep="/"))
-  if()
+  totalSimilarity<-0 #initialization
+  if(d==FALSE)
   {
-  myMatrix = textmatrix(td, minWordLength=1)
-  
-  similaryContentQuery <- lsa::cosine(myMatrix[,1], myMatrix[,2])
-  
-  totalSimilarity<-0.8*similaryTitleQuery[1,1]+0.2*similaryContentQuery[1,1]
-  }
-  
-  else
-  {
+    myMatrix = textmatrix(td, minWordLength=1)
+    
+    similaryContentQuery <- lsa::cosine(myMatrix[,1], myMatrix[,2])
+    
+    totalSimilarity<-0.8*similaryTitleQuery[1,1]+0.2*similaryContentQuery[1,1]
+    
+  }else {
     totalSimilarity<-similaryTitleQuery[1,1]
   }
+  
+  totalSimilarity
   results<-rbind(results, data.frame(queryId =train$id[i] , sim = totalSimilarity))
   
  
@@ -93,10 +99,9 @@ for (i in 1:1749)
 }
 
 
-
 #preproccesing to query
 
-queries <- paste(train$query[3], collapse=" ")
+queries <- paste(train$query[4], collapse=" ")
 
 queries_source <- VectorSource(queries)
 
@@ -115,7 +120,7 @@ query<-dtm$dimnames$Terms
 
 
 #preproccesing to title
-title<-paste(train$product_title[3], collapse=" ")
+title<-paste(train$product_title[4], collapse=" ")
 
 queries_source <- VectorSource(title)
 
@@ -141,7 +146,11 @@ similaryTitleQuery <- lsa::cosine(myMatrix[,1], myMatrix[,2])
 
 
 #preproccesing to description
-desciption<-paste(train$product_description[3], collapse=" ")
+desciption<-paste(train$product_description[4], collapse=" ")
+d=TRUE
+if(desciption!=""){
+  d=FALSE
+}
 
 queries_source <- VectorSource(desciption)
 
@@ -158,11 +167,18 @@ dtm <- DocumentTermMatrix(corpus)
 desciption<-dtm$dimnames$Terms
 
 write( desciption, file=paste(td, "D2", sep="/"))
-myMatrix = textmatrix(td, minWordLength=1)
+totalSimilarity<-0 #initialization
+#if(d==FALSE)
+#{
+  myMatrix = textmatrix(td, minWordLength=1)
+  
+  similaryContentQuery <- lsa::cosine(myMatrix[,1], myMatrix[,2])
+  
+  totalSimilarity<-0.8*similaryTitleQuery[1,1]+0.2*similaryContentQuery[1,1]
+  
+#}else {
+  totalSimilarity<-similaryTitleQuery[1,1]
+#}
 
-similaryContentQuery <- lsa::cosine(myMatrix[,1], myMatrix[,2])
-
-totalSimilarity<-0.8*similaryTitleQuery[1,1]+0.2*similaryContentQuery[1,1]
-
-
-train$product_description[3]
+totalSimilarity
+results<-rbind(results, data.frame(queryId =train$id[i] , sim = totalSimilarity))
