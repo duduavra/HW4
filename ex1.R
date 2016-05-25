@@ -3,15 +3,16 @@
 library(readr)
 train <- read_csv("train.csv")
 td = tempfile()
+
 dir.create(td)
-results <- data.frame(queryId = numeric(), sim = numeric())
+results <- data.frame(queryId = numeric(), simTitle = numeric(),simDescription = numeric())
 
 library(tm)
 library(lsa)
 
 for (i in 1:10158)
 {
-  i
+  
   #preproccesing to query
   queries <- paste(train$query[i], collapse=" ")
   query=NULL
@@ -88,60 +89,42 @@ for (i in 1:10158)
 
 
   write( desciption, file=paste(td, "D2", sep="/"))
-  totalSimilarity<-0 #initialization
+  #totalSimilarity<-0 #initialization
   if(d==FALSE)
   {
     myMatrix = textmatrix(td, minWordLength=1)
 
     similaryContentQuery <- lsa::cosine(myMatrix[,1], myMatrix[,2])
 
-    totalSimilarity<-0.8*similaryTitleQuery[1,1]+0.2*similaryContentQuery[1,1]
+ #   totalSimilarity<-0.8*similaryTitleQuery[1,1]+0.2*similaryContentQuery[1,1]
 
   }else {
-    totalSimilarity<-similaryTitleQuery[1,1]
+ #   totalSimilarity<-similaryTitleQuery[1,1]
+    similaryContentQuery<-0
   }
 
-  totalSimilarity
-  results<-rbind(results, data.frame(queryId =train$id[i] , sim = totalSimilarity))
+  results<-rbind(results, data.frame(queryId =train$id[i] , simTitle = similaryTitleQuery,simDescription=similaryContentQuery))
 
 
 
 }
 
-
-#preproccesing to query
-
-queries <- paste(train$query[111], collapse=" ")
-query=NULL
-if (length(queries)==1)
-{
-  query=queries
-} else {
-  queries_source <- VectorSource(queries)
-  
-  corpus <- Corpus(queries_source)
-  
-  corpus <- tm_map(corpus, content_transformer(tolower))
-  corpus <- tm_map(corpus, removePunctuation)
-  
-  corpus <- tm_map(corpus, stripWhitespace)
-  
-  corpus <- tm_map(corpus, removeWords, stopwords("english"))
-  
-  
-  dtm <- DocumentTermMatrix(corpus)
-  
-  query<-dtm$dimnames$Terms
-}
+#write.csv(file="train1.csv", x=results)
 
 results["Median_Rating"] <- train$median_relevance
-results["Median_Rating"]<-as.factor(results["Median_Rating"])
-library("rpart", lib.loc="C:/Program Files/R/R-3.2.4revised/library")
-tree <- rpart(results$Median_Rating ~ results$sim , method="class")
-plot(tree)
+# library("rpart", lib.loc="C:/Program Files/R/R-3.2.4revised/library")
+# tree <- rpart(results$Median_Rating ~ results$sim , method="class")
+# plot(tree)
+write.csv(file="train1.csv", x=results)
+
 results$Median_Rating <- as.factor(results$Median_Rating)
-m1 <- J48(Median_Rating ~ sim, data = results)
+library(RWeka)
+m1 <- J48(Median_Rating ~simTitle,simDescription , data = results)
+library(partykit)
+
 plot(m1)
+
+m1
 # #preproccesing to title
 # title<-paste(train$product_title[111], collapse=" ")
 # 
