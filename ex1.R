@@ -136,7 +136,7 @@ for (i in 1:22513)
 {
   
   #preproccesing to query
-  queries <- paste(test$query[i], collapse=" ")
+  queries <- paste(test$query[3528], collapse=" ")
   query=NULL
   if (length(queries)==1)
   {
@@ -160,27 +160,36 @@ for (i in 1:22513)
   }
   
   
+  
+  
   #preproccesing to title
-  title<-paste(test$product_title[i], collapse=" ")
+  title<-paste(test$product_title[3528], collapse=" ")
+  titlep=NULL
   
-  queries_source <- VectorSource(title)
+  if (length(queries)==1)
+  {
+    titlep=title
+  } else {
+    queries_source <- VectorSource(title)
+    
+    corpus <- Corpus(queries_source)
+    corpus <- tm_map(corpus, content_transformer(tolower))
+    corpus <- tm_map(corpus, removePunctuation)
+    
+    corpus <- tm_map(corpus, stripWhitespace)
+    
+    corpus <- tm_map(corpus, removeWords, stopwords("english"))
+    
+    
+    dtm <- DocumentTermMatrix(corpus)
+    titlep<-dtm$dimnames$Terms
+  }
   
-  corpus <- Corpus(queries_source)
-  corpus <- tm_map(corpus, content_transformer(tolower))
-  corpus <- tm_map(corpus, removePunctuation)
-  
-  corpus <- tm_map(corpus, stripWhitespace)
-  
-  corpus <- tm_map(corpus, removeWords, stopwords("english"))
-  
-  
-  dtm <- DocumentTermMatrix(corpus)
-  title<-dtm$dimnames$Terms
   
   #cosSimilarity between title and query
   
   write( query, file=paste(td, "D1", sep="/"))
-  write( title, file=paste(td, "D2", sep="/"))
+  write( titlep, file=paste(td, "D2", sep="/"))
   myMatrix = textmatrix(td, minWordLength=1)
   
   similaryTitleQuery <- lsa::cosine(myMatrix[,1], myMatrix[,2])
@@ -258,3 +267,15 @@ submit_data <- read.csv("test.csv", header=TRUE)
 submit_data <- select(submit_data,id)
 submit_data["prediction"] <- predictions
 write.csv(submit_data, file = "Submission.csv")
+
+
+
+
+
+
+
+
+
+
+
+
