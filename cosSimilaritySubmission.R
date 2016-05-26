@@ -125,6 +125,7 @@ library(RWeka)
 library(partykit)
 
 m1<-J48(Median_Rating~., data = train1)
+
 summary(m1)
 
 #load test set
@@ -241,32 +242,23 @@ for (i in 1:22513)
 }
 
 write.csv(file="test1.csv", x=test_featuers)
+test_featuer <- read_csv("test1.csv")
+test_featuer$ds=NULL
 
+library("dplyr")
 
-predictions <- predict(m1, test_featuers)
-submit_data["id"] <- test$id
-submit_data["prediction"] <- predictions
-write.csv(submit_data, file = "Submission.csv")
-
-
-
-
-
+predictions <- predict(m1, test_featuer)
+# submit_data<-data.frame(id=numeric(),prediction=numeric())
 submit_data <- select(test,id)
-
-train1$ds=NULL
-train1$queryId=NULLplot(m1)
-
-m1
-
-train_data_features$median_relevance<-as.factor(train_data_features$median_relevance)
-fit <- J48(median_relevance~., data=train_data_features)
-summary(fit)
-predictions <- predict(fit, test_data_features)
-submit_data <- read.csv("test.csv", header=TRUE)
-submit_data <- select(submit_data,id)
 submit_data["prediction"] <- predictions
-write.csv(submit_data, file = "Submission.csv")
+write.csv(submit_data, file = "Submission.csv",row.names=F)
+
+
+
+
+
+
+
 
 
 
