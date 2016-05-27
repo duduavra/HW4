@@ -11,7 +11,7 @@ library(tm)
 library(lsa)
 
 
-for (i in 1:10158)
+for (i in 1:200)
 {
 
   #preproccesing to query
@@ -104,7 +104,7 @@ for (i in 1:10158)
 
 
 
-write.csv(file="train_after_stemming.csv", x=train_After_Stemming)
+write.csv(file="train_after_stemming.csv", x=train_After_Stemming, row.names = F)
 
 
 
@@ -116,7 +116,7 @@ train <- read_csv("test.csv")
 
 test_After_Stemming <- data.frame(id = numeric(), query = character(),product_title = character(), product_description = character())
 
-for (i in 1:22513)
+for (i in 1:200)
 {
   
   #preproccesing to query
@@ -207,7 +207,7 @@ for (i in 1:22513)
 }
 
 
-write.csv(file="test_after_stemming.csv", x=test_After_Stemming)
+write.csv(file="test_after_stemming.csv", x=test_After_Stemming, row.names = F)
 
 
 
