@@ -121,10 +121,9 @@ train1$queryId=NULL
 
 train1$Median_Rating <- as.factor(train1$Median_Rating)
 
-library(RWeka)
-library(partykit)
+library("randomForest")
 
-m1<-J48(Median_Rating~., data = train1)
+m1<-randomForest(Median_Rating~., data = train1,ntree=3)
 
 summary(m1)
 
@@ -246,35 +245,8 @@ test_featuer <- read_csv("test1.csv")
 test_featuer$ds=NULL
 
 library("dplyr")
-library("randomForest")
 predictions <- predict(m1, test_featuer)
-# submit_data<-data.frame(id=numeric(),prediction=numeric())
+
 submit_data <- select(test,id)
 submit_data["prediction"] <- predictions
-write.csv(submit_data, file = "Submission.csv",row.names=F)
-
-m1<-randomForest(Median_Rating~., data = train1)
-
-summary(m1)
-
-#load test set
-test <- read_csv("test.csv")
-
-test_featuers<-data.frame(simTitle = numeric(), simDescription = numeric())
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+write.csv(submit_data, file = "SubmissionRandomForest.csv",row.names=F)
