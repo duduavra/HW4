@@ -10,103 +10,56 @@ results <- data.frame(queryId = numeric(), simTitle = numeric(),simDescription =
 library(tm)
 library(lsa)
 
-for (i in 1:500)
+for (i in 1:10)
 {
-
+  
   #preproccesing to query
-  queries <- paste(train$query[i], collapse=" ")
-  query=NULL
-  if (length(queries)==1)
-  {
-    query=queries
-  } else {
-    queries_source <- VectorSource(queries)
-
-    corpus <- Corpus(queries_source)
-
-    corpus <- tm_map(corpus, content_transformer(tolower))
-    corpus <- tm_map(corpus, removePunctuation)
-
-    corpus <- tm_map(corpus, stripWhitespace)
-
-    corpus <- tm_map(corpus, removeWords, stopwords("english"))
-
-
-    dtm <- DocumentTermMatrix(corpus)
-
-    query<-dtm$dimnames$Terms
-  }
-
-
+  query <- paste(train$query[i], collapse=" ")
+  
+  
+  
   #preproccesing to title
   title<-paste(train$product_title[i], collapse=" ")
-
-  queries_source <- VectorSource(title)
-
-  corpus <- Corpus(queries_source)
-  corpus <- tm_map(corpus, content_transformer(tolower))
-  corpus <- tm_map(corpus, removePunctuation)
-
-  corpus <- tm_map(corpus, stripWhitespace)
-
-  corpus <- tm_map(corpus, removeWords, stopwords("english"))
-
-
-  dtm <- DocumentTermMatrix(corpus)
-  title<-dtm$dimnames$Terms
-
+  
+ 
+  
   #cosSimilarity between title and query
-
+  
   write( query, file=paste(td, "D1", sep="/"))
   write( title, file=paste(td, "D2", sep="/"))
   myMatrix = textmatrix(td, minWordLength=1)
-
+  
   similaryTitleQuery <- lsa::cosine(myMatrix[,1], myMatrix[,2])
-
-
+  
+  
   #preproccesing to description
   desciption<-paste(train$product_description[i], collapse=" ")
-  d=TRUE
-  if(desciption!=""){
-    d=FALSE
+  d=FALSE
+  if (length(desciption)==0)
+  {
+    d=TRUE
   }
-
-  queries_source <- VectorSource(desciption)
-
-  corpus <- Corpus(queries_source)
-  corpus <- tm_map(corpus, content_transformer(tolower))
-  corpus <- tm_map(corpus, removePunctuation)
-
-  corpus <- tm_map(corpus, stripWhitespace)
-
-  corpus <- tm_map(corpus, removeWords, stopwords("english"))
-
-
-  dtm <- DocumentTermMatrix(corpus)
-  desciption<-dtm$dimnames$Terms
-  desciption<-strsplit(gsub("[^[:alnum:] ]", "", desciption), " +")
-  desciption<-as.character(desciption)
-
-
+  
+  
   write( desciption, file=paste(td, "D2", sep="/"))
-  #totalSimilarity<-0 #initialization
+  
   if(d==FALSE)
   {
     myMatrix = textmatrix(td, minWordLength=1)
-
+    
     similaryContentQuery <- lsa::cosine(myMatrix[,1], myMatrix[,2])
-
-
-
+    
+    
+    
   }else {
-
+    
     similaryContentQuery<-0
   }
-
+  
   results<-rbind(results, data.frame(queryId =train$id[i] , simTitle = similaryTitleQuery,simDescription=similaryContentQuery))
-
-
-
+  
+  
+  
 }
 
 
