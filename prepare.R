@@ -114,9 +114,9 @@ write.csv(file="train_after_stemming.csv", x=train_After_Stemming)
 
 train <- read_csv("test.csv")
 
-test_After_Stemming <- data.frame(id = numeric(), query = character(),product_title = character(), product_description = character(), median_relevance = numeric(), relevance_variance = numeric())
+test_After_Stemming <- data.frame(id = numeric(), query = character(),product_title = character(), product_description = character())
 
-for (i in 1:10158)
+for (i in 1:22513)
 {
   
   #preproccesing to query
@@ -199,11 +199,10 @@ for (i in 1:10158)
   }
   
   
-  median <- train$median_relevance[i]
-  var <- train$relevance_variance[i]
+
   
   #train_After_Stemming<-rbind(train_After_Stemming, data.frame(id =train$id[i] , query = current_query,product_title = title, product_description = desciption, median_relevance = median, relevance_variance = var))
-  test_After_Stemming<-rbind(test_After_Stemming, data.frame(id =train$id[i] , query = current_query,product_title = total_title, product_description = total_desc, median_relevance = median, relevance_variance = var))
+  test_After_Stemming<-rbind(test_After_Stemming, data.frame(id =train$id[i] , query = current_query,product_title = total_title, product_description = total_desc))
   
 }
 
